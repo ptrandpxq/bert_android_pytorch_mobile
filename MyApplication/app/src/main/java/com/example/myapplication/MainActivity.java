@@ -9,10 +9,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.pytorch.IValue;
-import org.pytorch.LiteModuleLoader;
+//import org.pytorch.LiteModuleLoader;
 import org.pytorch.Module;
 import org.pytorch.Tensor;
-import org.pytorch.torchvision.TensorImageUtils;
+//import org.pytorch.torchvision.TensorImageUtils;
 import org.pytorch.MemoryFormat;
 
 
