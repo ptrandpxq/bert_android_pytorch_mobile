@@ -1,8 +1,7 @@
 package com.example.myapplication;
 
-//import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -20,7 +19,7 @@ import org.pytorch.MemoryFormat;
 
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
 
     @Override
@@ -36,15 +35,8 @@ public class MainActivity extends Activity {
 
         String message = editText.getText().toString();
 
-
-        int output = number(message)
-
         TextView textView = findViewById(R.id.text_output);
-        textView.setText(output);
+        textView.setText(message);
     }
-    public int number(String s) {
-        return 100;
-    }
-
 
 }
