@@ -70,21 +70,20 @@ public class MainActivity extends AppCompatActivity {
 //        FileReader fr = new FileReader("../vocab.txt");
         BufferedReader br = new BufferedReader(ir);
 
-        System.out.println(br.readLine());
         String line;
         this.mTokenIdMap = new HashMap();
         this.mIdTokenMap = new HashMap();
 
 
         long count = 0L;
-        System.out.println("no");
         while(true) {
 
             line = br.readLine();
             if (line != null) {
-                System.out.println(line);
-                this.mTokenIdMap.put(line,count);
-                this.mIdTokenMap.put(count, line);
+//                System.out.println("oooo"+line+count);
+                this.mTokenIdMap.put(line, count); // HashMap that maps word and id
+                this.mIdTokenMap.put(count, line); // HashMap that maps id and word
+                count++; // count++ and give each word a id
             } else {
                 break;
             }
@@ -100,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         TextView textView = findViewById(R.id.text_output);
-        String temp_message = tokenizer(message); // let input pass the tokenizer
+        long[] ids = tokenizer("like the the the"); // let input pass the tokenizer
+        String temp_message = String.valueOf(ids[1]);
         textView.setText(temp_message);
         // until here
 
@@ -110,31 +110,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private final String tokenizer(String text) {
+    private final long[] tokenizer(String text) {
             List<Long> tokenIdsText = this.wordPieceTokenizer(text);
-            System.out.println("startqweqweqwe");
-            for (int i = 0; i < tokenIdsText.size(); ++i) {
-                System.out.println(tokenIdsText.get(i));
-            }
+//            System.out.println("startqweqweqwe");
+//            for (int i = 0; i < tokenIdsText.size(); ++i) {
+//                System.out.println(tokenIdsText.get(i));
+//            }
             int inputLength = tokenIdsText.size() + this.EXTRA_ID_NUM;
             long[] ids = new long[Math.min(this.MODEL_INPUT_LENGTH, inputLength)];
 
 
-//            ids[0] = this.mTokenIdMap.get(this.CLS);
-//            System.out.println(ids[0]);
+            ids[0] = this.mTokenIdMap.get(this.CLS);
+            System.out.println(ids[0]);
 //            System.out.println("qweqweqwe");
-////
-////
-//            for(int i =0; i <tokenIdsText.size(); ++i) {
-//                ids[i + 1] = this.mTokenIdMap.get(tokenIdsText.get(i)).longValue(); // get word's id
-//            }
-//            ids[tokenIdsText.size() + 1] = this.mTokenIdMap.get(this.SEP);
 
-//            System.out.println(ids);
-//            for (long j : ids) {
-//                System.out.println(j);
-//                System.out.println("qweqweqwe");
-//            }
+            System.out.println(tokenIdsText.size()); // The size will be equal to the input length e.g., like the = 2
+            for(int i = 0; i < tokenIdsText.size(); ++i) {
+                ids[i + 1] = tokenIdsText.get(i).longValue(); // put word ids into ids List
+            }
+            ids[tokenIdsText.size() + 1] = this.mTokenIdMap.get(this.SEP);
+//
+            System.out.println(ids);
+            for (long j : ids) {
+                System.out.println("iiii"+j);
+            }
 
 //            int maxTextLength = Math.min(tokenIdsText.size(), this.MODEL_INPUT_LENGTH - tokenIdsQuestion.size() - this.EXTRA_ID_NUM);
 //
@@ -144,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 //
 //            ids[tokenIdsQuestion.size() + maxTextLength + 2] = this.mTokenIdMap.get(SEP);
 
-            return "Pass";
+            return ids;
 //        }
     }
 
@@ -159,17 +158,16 @@ public class MainActivity extends AppCompatActivity {
 
         while (m.find()) {
             String token = m.group().toLowerCase();
-            System.out.println(this.mTokenIdMap.containsKey(token)+"werwerwer");
 
             // if mTokenIdMap doest have the token
-            if (!this.mTokenIdMap.containsKey(token)) {
+            if (this.mTokenIdMap.containsKey(token)) {
                 tokenIds.add(this.mTokenIdMap.get(token));
             } else {
-                System.out.println("jinlaile");
+
                 for (int i = 0; i < token.length(); ++i) {
 
-
-                    if (!this.mTokenIdMap.containsKey(token.substring(0, token.length() - i - 1))) {
+                    System.out.println("jinlaile"+token.substring(0, token.length() - i - 1));
+                    if (this.mTokenIdMap.containsKey(token.substring(0, token.length() - i - 1))) {
 
                         tokenIds.add(this.mTokenIdMap.get(token.substring(0, token.length() - i - 1)));
                         String subToken = token.substring(token.length() - i - 1);
@@ -194,5 +192,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return tokenIds;
     }
+
 
 }
