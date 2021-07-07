@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,7 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.pytorch.IValue;
-//import org.pytorch.LiteModuleLoader;
+import org.pytorch.LiteModuleLoader;
 import org.pytorch.Module;
 import org.pytorch.Tensor;
 //import org.pytorch.torchvision.TensorImageUtils;
@@ -17,9 +18,12 @@ import org.pytorch.MemoryFormat;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,8 +94,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         }
-
-
 
 
         ////
@@ -193,5 +195,29 @@ public class MainActivity extends AppCompatActivity {
         return tokenIds;
     }
 
+    public static String assetFilePath(Context context, String assetName) throws IOException {
+        File file = new File(context.getFilesDir(), assetName);
+        if (file.exists() && file.length() > 0) {
+            return file.getAbsolutePath();
+        }
+
+        try (InputStream is = context.getAssets().open(assetName)) {
+            try (OutputStream os = new FileOutputStream(file)) {
+                byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, read);
+                }
+                os.flush();
+            }
+            return file.getAbsolutePath();
+        }
+    }
+
+    private int Inference(String input) throws IOException {
+            Module module = null;
+            module = LiteModuleLoader.load(assetFilePath(this, "qa360_quantized.ptl"));
+        return 0;
+    }
 
 }
