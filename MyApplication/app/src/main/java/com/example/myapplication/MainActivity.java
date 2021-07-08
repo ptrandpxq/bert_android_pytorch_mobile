@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private final long[] tokenizer(String text) {
+    private final long[] tokenizer(String text) throws IOException {
             List<Long> tokenIdsText = this.wordPieceTokenizer(text);
 //            System.out.println("startqweqweqwe");
 //            for (int i = 0; i < tokenIdsText.size(); ++i) {
@@ -136,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
             for (long j : ids) {
                 System.out.println("iiii"+j);
             }
+            int a = this.Inference("start");
 
 //            int maxTextLength = Math.min(tokenIdsText.size(), this.MODEL_INPUT_LENGTH - tokenIdsQuestion.size() - this.EXTRA_ID_NUM);
 //
@@ -216,7 +218,14 @@ public class MainActivity extends AppCompatActivity {
 
     private int Inference(String input) throws IOException {
             Module module = null;
-            module = LiteModuleLoader.load(assetFilePath(this, "qa360_quantized.ptl"));
+            float[] ft= new float[1023];
+            long[] shape = {1,1023};
+            Tensor test_tensor = Tensor.fromBlob(ft, shape);
+            System.out.println(test_tensor+"iopiopiop");
+            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "model3.ptl"));
+            IValue outTensors = mModule.forward(IValue.from(test_tensor));;
+            System.out.println(mModule);
+            System.out.println(outTensors.toTensor());
         return 0;
     }
 
