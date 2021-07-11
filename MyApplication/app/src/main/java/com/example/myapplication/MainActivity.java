@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -14,7 +15,7 @@ import org.pytorch.LiteModuleLoader;
 import org.pytorch.Module;
 import org.pytorch.Tensor;
 //import org.pytorch.torchvision.TensorImageUtils;
-import org.pytorch.MemoryFormat;
+//import org.pytorch.MemoryFormat;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.LongBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +62,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        try {
+            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "qa360_quantized.ptl"));
+        } catch (IOException e) {
+            Log.e("BERT Inference", "Error reading assets", e);
+            finish();
+        }
+
     }
 
     /** Called when the user taps the Send button */
@@ -76,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
         BufferedReader br = new BufferedReader(ir);
 
         String line;
-        this.mTokenIdMap = new HashMap();
-        this.mIdTokenMap = new HashMap();
+        this.mTokenIdMap = new HashMap(); // create the HashMap that maps word and id
+        this.mIdTokenMap = new HashMap(); // create the HashMap that maps id and word
 
 
         long count = 0L;
@@ -93,18 +103,19 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
 
-
         }
 
 
-        ////
-
-
-
         TextView textView = findViewById(R.id.text_output);
-        long[] ids = tokenizer("like the the the"); // let input pass the tokenizer
-        String temp_message = String.valueOf(ids[1]);
+        long[] ids = tokenizer("like zqpzqps"); // let input pass the tokenizer
+        for (long i : ids) {
+            System.out.println(i+"qweqweqwe");
+        }
+        String temp_message = String.valueOf(ids[4]);
         textView.setText(temp_message);
+
+        int a = this.Inference("start");
+        System.out.println(a);
         // until here
 
         //            BufferedReader br = new BufferedReader(new InputStreamReader(this.getAssets().open("vocab.txt")));
@@ -125,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
 
             ids[0] = this.mTokenIdMap.get(this.CLS);
             System.out.println(ids[0]);
-//            System.out.println("qweqweqwe");
 
             System.out.println(tokenIdsText.size()); // The size will be equal to the input length e.g., like the = 2
             for(int i = 0; i < tokenIdsText.size(); ++i) {
@@ -137,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             for (long j : ids) {
                 System.out.println("iiii"+j);
             }
-            int a = this.Inference("start");
+
 
 //            int maxTextLength = Math.min(tokenIdsText.size(), this.MODEL_INPUT_LENGTH - tokenIdsQuestion.size() - this.EXTRA_ID_NUM);
 //
@@ -163,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         while (m.find()) {
             String token = m.group().toLowerCase();
 
-            // if mTokenIdMap doest have the token
+            // if the token in the mTokenIdMap then add its id to tokenIds
             if (this.mTokenIdMap.containsKey(token)) {
                 tokenIds.add(this.mTokenIdMap.get(token));
             } else {
@@ -174,11 +184,14 @@ public class MainActivity extends AppCompatActivity {
                     if (this.mTokenIdMap.containsKey(token.substring(0, token.length() - i - 1))) {
 
                         tokenIds.add(this.mTokenIdMap.get(token.substring(0, token.length() - i - 1)));
-                        String subToken = token.substring(token.length() - i - 1);
+                        String subToken = token.substring(token.length() - i - 1); // latter part of the word
                         int j = 0;
+                        System.out.println(this.mTokenIdMap.get(token.substring(0, token.length() - i - 1)));
+                        System.out.println(subToken);
 
                         while (j < subToken.length()) {
-                            if (!this.mTokenIdMap.containsKey("##" + subToken.substring(0, subToken.length() - j))) {
+                            if (this.mTokenIdMap.containsKey("##" + subToken.substring(0, subToken.length() - j))) {
+                                System.out.println(this.mTokenIdMap.get("##" + subToken.substring(0, subToken.length() - j)));
                                 tokenIds.add(this.mTokenIdMap.get("##" + subToken.substring(0, subToken.length() - j)));
                                 subToken = subToken.substring(subToken.length() - j);
                                 j = subToken.length() - j;
@@ -196,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return tokenIds;
     }
+
 
     public static String assetFilePath(Context context, String assetName) throws IOException {
         File file = new File(context.getFilesDir(), assetName);
@@ -217,15 +231,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int Inference(String input) throws IOException {
-            Module module = null;
-            float[] ft= new float[1023];
-            long[] shape = {1,1023};
-            Tensor test_tensor = Tensor.fromBlob(ft, shape);
-            System.out.println(test_tensor+"iopiopiop");
-            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "model3.ptl"));
-            IValue outTensors = mModule.forward(IValue.from(test_tensor));;
-            System.out.println(mModule);
-            System.out.println(outTensors.toTensor());
+//        float[] ft= new float[1024];
+//        long[] shape = {1,1024};
+//        Tensor test_tensor = Tensor.fromBlob(ft, shape);
+//        System.out.println(test_tensor+"iopiopiop");
+
+//        IValue outTensors = mModule.forward(IValue.from(test_tensor));
+//        System.out.println(outTensors.toTensor());
+
+        long[] tokenIds = this.tokenizer(input);
+        for (long i : tokenIds) {
+            System.out.println(i+"qweqweqwe");
+        }
+
+        LongBuffer inTensorBuffer = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
+        // put token ids to inTensorBuffer
+        for (long n : tokenIds) {
+            inTensorBuffer.put(n);
+        }
+        // Fill paddings
+        for (int i = 0; i < MODEL_INPUT_LENGTH - tokenIds.length; ++i) {
+            inTensorBuffer.put(this.mTokenIdMap.get(this.PAD));
+        }
+
+        // fromBlob (input_buffer, input_shape)
+        Tensor inTensor = Tensor.fromBlob(inTensorBuffer, new long[]{1L, this.MODEL_INPUT_LENGTH});
+        System.out.println(inTensor);
+        long[] test = inTensor.getDataAsLongArray();
+        for (long i : test) {
+            System.out.println(i);
+        }
+        Map<String, IValue> outTensors = mModule.forward(IValue.from(inTensor)).toDictStringKey();
+        System.out.println(outTensors);
+
+
         return 0;
     }
 
