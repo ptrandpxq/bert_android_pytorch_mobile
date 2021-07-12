@@ -49,11 +49,12 @@ public class MainActivity extends AppCompatActivity {
     private HashMap<String, Long> mTokenIdMap;
     private HashMap<Long, String> mIdTokenMap;
 
-    private final int MODEL_INPUT_LENGTH = 360;
+    private final int MODEL_INPUT_LENGTH = 128;
     private final int EXTRA_ID_NUM = 3;
     private final String CLS = "[CLS]";
     private final String SEP = "[SEP]";
     private final String PAD = "[PAD]";
+    private final String UNK = "[UNK]";
     private final String START_LOGITS = "start_logits";
     private final String END_LOGITS = "end_logits";
 
@@ -62,9 +63,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        // Load the model
         try {
-            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "qa360_quantized.ptl"));
+            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "BERT_2_128.ptl"));
         } catch (IOException e) {
             Log.e("BERT Inference", "Error reading assets", e);
             finish();
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // logic
+//        BufferedReader br = new BufferedReader(new InputStreamReader(this.getAssets().open("vocab.txt")));
         InputStreamReader ir = new InputStreamReader(this.getAssets().open("vocab.txt")); // need to use inpustreamreader and getassets method
 //        FileReader fr = new FileReader("../vocab.txt");
         BufferedReader br = new BufferedReader(ir);
@@ -107,18 +109,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         TextView textView = findViewById(R.id.text_output);
-        long[] ids = tokenizer("like zqpzqps"); // let input pass the tokenizer
+        long[] ids = tokenizer("like zzqzzq"); // let input pass the tokenizer
         for (long i : ids) {
             System.out.println(i+"qweqweqwe");
         }
-        String temp_message = String.valueOf(ids[4]);
+        String temp_message = String.valueOf(ids[1]);
         textView.setText(temp_message);
 
         int a = this.Inference("start");
         System.out.println(a);
         // until here
-
-        //            BufferedReader br = new BufferedReader(new InputStreamReader(this.getAssets().open("vocab.txt")));
 
 
 
@@ -143,10 +143,10 @@ public class MainActivity extends AppCompatActivity {
             }
             ids[tokenIdsText.size() + 1] = this.mTokenIdMap.get(this.SEP);
 //
-            System.out.println(ids);
-            for (long j : ids) {
-                System.out.println("iiii"+j);
-            }
+//            System.out.println(ids);
+//            for (long j : ids) {
+//                System.out.println("iiii"+j);
+//            }
 
 
 //            int maxTextLength = Math.min(tokenIdsText.size(), this.MODEL_INPUT_LENGTH - tokenIdsQuestion.size() - this.EXTRA_ID_NUM);
@@ -261,8 +261,11 @@ public class MainActivity extends AppCompatActivity {
         for (long i : test) {
             System.out.println(i);
         }
-        Map<String, IValue> outTensors = mModule.forward(IValue.from(inTensor)).toDictStringKey();
-        System.out.println(outTensors);
+
+        IValue outTensors = mModule.forward(IValue.from(inTensor)); // the output of BERT is a tuple
+        IValue[] outTensorss = outTensors.toTuple();
+//        Map<String, IValue> outTensors = mModule.forward(IValue.from(inTensor)).toDictStringKey();
+        System.out.println(outTensorss[0].toTensor());
 
 
         return 0;
