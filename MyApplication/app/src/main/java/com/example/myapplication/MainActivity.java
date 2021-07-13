@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Load the model
         try {
-            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "BERT_2_128.ptl"));
+            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "BERT.ptl"));
         } catch (IOException e) {
             Log.e("BERT Inference", "Error reading assets", e);
             finish();
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
             line = br.readLine();
             if (line != null) {
-//                System.out.println("oooo"+line+count);
+//                System.out.println(line+count);
                 this.mTokenIdMap.put(line, count); // HashMap that maps word and id
                 this.mIdTokenMap.put(count, line); // HashMap that maps id and word
                 count++; // count++ and give each word a id
@@ -109,14 +110,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         TextView textView = findViewById(R.id.text_output);
-        long[] ids = tokenizer("like zzqzzq"); // let input pass the tokenizer
+        long[] ids = tokenizer("like two the the"); // let input pass the tokenizer
         for (long i : ids) {
-            System.out.println(i+"qweqweqwe");
+            System.out.print(i+",");
         }
+        System.out.println("?<?><");
         String temp_message = String.valueOf(ids[1]);
         textView.setText(temp_message);
 
-        int a = this.Inference("start");
+        int a = this.Inference("like the");
         System.out.println(a);
         // until here
 
@@ -126,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
 
     private final long[] tokenizer(String text) throws IOException {
             List<Long> tokenIdsText = this.wordPieceTokenizer(text);
-//            System.out.println("startqweqweqwe");
 //            for (int i = 0; i < tokenIdsText.size(); ++i) {
 //                System.out.println(tokenIdsText.get(i));
 //            }
@@ -135,9 +136,9 @@ public class MainActivity extends AppCompatActivity {
 
 
             ids[0] = this.mTokenIdMap.get(this.CLS);
-            System.out.println(ids[0]);
-
-            System.out.println(tokenIdsText.size()); // The size will be equal to the input length e.g., like the = 2
+//            System.out.println(ids[0]);
+//
+//            System.out.println(tokenIdsText.size()); // The size will be equal to the input length e.g., like the = 2
             for(int i = 0; i < tokenIdsText.size(); ++i) {
                 ids[i + 1] = tokenIdsText.get(i).longValue(); // put word ids into ids List
             }
@@ -241,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
 
         long[] tokenIds = this.tokenizer(input);
         for (long i : tokenIds) {
-            System.out.println(i+"qweqweqwe");
+            System.out.println("Token id "+i);
         }
 
         LongBuffer inTensorBuffer = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
@@ -261,11 +262,19 @@ public class MainActivity extends AppCompatActivity {
         for (long i : test) {
             System.out.println(i);
         }
-
+        final long startTime = SystemClock.elapsedRealtime();
         IValue outTensors = mModule.forward(IValue.from(inTensor)); // the output of BERT is a tuple
+        final long inferenceTime = SystemClock.elapsedRealtime() - startTime;
+        Log.d("BERTINFERNCE",  "inference time (ms): " + inferenceTime);
+
         IValue[] outTensorss = outTensors.toTuple();
 //        Map<String, IValue> outTensors = mModule.forward(IValue.from(inTensor)).toDictStringKey();
+        float[] ff = outTensorss[0].toTensor().getDataAsFloatArray();
+
         System.out.println(outTensorss[0].toTensor());
+        for (float f : ff) {
+            System.out.println(f+"bnmbnm");
+        }
 
 
         return 0;
