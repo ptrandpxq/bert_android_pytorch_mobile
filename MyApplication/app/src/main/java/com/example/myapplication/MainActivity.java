@@ -255,20 +255,46 @@ public class MainActivity extends AppCompatActivity {
             inTensorBuffer.put(this.mTokenIdMap.get(this.PAD));
         }
 
-        // fromBlob (input_buffer, input_shape)
-        Tensor inTensor = Tensor.fromBlob(inTensorBuffer, new long[]{1L, this.MODEL_INPUT_LENGTH});
+
+        Tensor inTensor = Tensor.fromBlob(inTensorBuffer, new long[]{1L, this.MODEL_INPUT_LENGTH}); // fromBlob (input_buffer, input_shape)
+
+
+
+
+
+        LongBuffer inTensorBuffer_2 = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
+        // put token ids to inTensorBuffer
+
+        for (int i = 0; i < MODEL_INPUT_LENGTH; ++i) {
+            inTensorBuffer_2.put(0L);
+        }
+        Tensor inTensor2 = Tensor.fromBlob(inTensorBuffer_2, new long[]{1L, this.MODEL_INPUT_LENGTH});
+
+
+        LongBuffer inTensorBuffer_3 = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
+        // put token ids to inTensorBuffer
+
+        for (int i = 0; i < MODEL_INPUT_LENGTH; ++i) {
+            inTensorBuffer_3.put(1L);
+        }
+
+
+        Tensor inTensor3 = Tensor.fromBlob(inTensorBuffer_3, new long[]{1L, this.MODEL_INPUT_LENGTH});
+
         System.out.println(inTensor);
         long[] test = inTensor.getDataAsLongArray();
         for (long i : test) {
             System.out.println(i);
         }
-        final long startTime = SystemClock.elapsedRealtime();
-        IValue outTensors = mModule.forward(IValue.from(inTensor)); // the output of BERT is a tuple
-        final long inferenceTime = SystemClock.elapsedRealtime() - startTime;
-        Log.d("BERTINFERNCE",  "inference time (ms): " + inferenceTime);
+//        final long startTime = SystemClock.elapsedRealtime();
+        IValue outTensors = mModule.forward(IValue.from(inTensor), IValue.from(inTensor2), IValue.from(inTensor3));
+//        IValue outTensors = mModule.forward(IValue.from(inTensor)); // the output of BERT is a tuple
+//        final long inferenceTime = SystemClock.elapsedRealtime() - startTime;
+//        Log.d("BERTINFERNCE",  "inference time (ms): " + inferenceTime);
 
         IValue[] outTensorss = outTensors.toTuple();
 //        Map<String, IValue> outTensors = mModule.forward(IValue.from(inTensor)).toDictStringKey();
+        System.out.println(outTensorss.length);
         float[] ff = outTensorss[0].toTensor().getDataAsFloatArray();
 
         System.out.println(outTensorss[0].toTensor());
