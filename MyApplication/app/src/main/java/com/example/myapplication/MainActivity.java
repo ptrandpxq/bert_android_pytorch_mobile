@@ -89,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
         BufferedReader br = new BufferedReader(ir);
 
         String line;
-        this.mTokenIdMap = new HashMap(); // create the HashMap that maps word and id
-        this.mIdTokenMap = new HashMap(); // create the HashMap that maps id and word
+        this.mTokenIdMap = new HashMap<String, Long>(); // create the HashMap that maps word and id
+        this.mIdTokenMap = new HashMap<Long, String>(); // create the HashMap that maps id and word
 
 
         long count = 0L;
@@ -118,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
         String temp_message = String.valueOf(ids[1]);
         textView.setText(temp_message);
 
-        int a = this.Inference("like the");
-        System.out.println(a);
+        int a = this.Inference("I hate the movie .");
+        System.out.println("Prediction: " + a);
         // until here
 
 
@@ -240,6 +240,8 @@ public class MainActivity extends AppCompatActivity {
 //        IValue outTensors = mModule.forward(IValue.from(test_tensor));
 //        System.out.println(outTensors.toTensor());
 
+        int result;
+
         long[] tokenIds = this.tokenizer(input);
         for (long i : tokenIds) {
             System.out.println("Token id "+i);
@@ -255,16 +257,12 @@ public class MainActivity extends AppCompatActivity {
             inTensorBuffer.put(this.mTokenIdMap.get(this.PAD));
         }
 
-
         Tensor inTensor = Tensor.fromBlob(inTensorBuffer, new long[]{1L, this.MODEL_INPUT_LENGTH}); // fromBlob (input_buffer, input_shape)
-
-
 
 
 
         LongBuffer inTensorBuffer_2 = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
         // put token ids to inTensorBuffer
-
         for (int i = 0; i < MODEL_INPUT_LENGTH; ++i) {
             inTensorBuffer_2.put(0L);
         }
@@ -273,13 +271,11 @@ public class MainActivity extends AppCompatActivity {
 
         LongBuffer inTensorBuffer_3 = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
         // put token ids to inTensorBuffer
-
         for (int i = 0; i < MODEL_INPUT_LENGTH; ++i) {
             inTensorBuffer_3.put(1L);
         }
-
-
         Tensor inTensor3 = Tensor.fromBlob(inTensorBuffer_3, new long[]{1L, this.MODEL_INPUT_LENGTH});
+
 
         System.out.println(inTensor);
         long[] test = inTensor.getDataAsLongArray();
@@ -287,23 +283,30 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(i);
         }
 //        final long startTime = SystemClock.elapsedRealtime();
-        IValue outTensors = mModule.forward(IValue.from(inTensor), IValue.from(inTensor2), IValue.from(inTensor3));
+        IValue outIValue = mModule.forward(IValue.from(inTensor), IValue.from(inTensor2), IValue.from(inTensor3));
 //        IValue outTensors = mModule.forward(IValue.from(inTensor)); // the output of BERT is a tuple
 //        final long inferenceTime = SystemClock.elapsedRealtime() - startTime;
 //        Log.d("BERTINFERNCE",  "inference time (ms): " + inferenceTime);
 
-        IValue[] outTensorss = outTensors.toTuple();
+        IValue[] outTuple = outIValue.toTuple();
 //        Map<String, IValue> outTensors = mModule.forward(IValue.from(inTensor)).toDictStringKey();
-        System.out.println(outTensorss.length);
-        float[] ff = outTensorss[0].toTensor().getDataAsFloatArray();
+//        System.out.println(outTuple.length);
+        Tensor outTensor = outTuple[0].toTensor();
+        float[] outTensorFloatArray = outTensor.getDataAsFloatArray();
+//        System.out.println(outTuple[0].toTensor());
 
-        System.out.println(outTensorss[0].toTensor());
-        for (float f : ff) {
-            System.out.println(f+"bnmbnm");
+//        for (float f : outTensorFloatArray) {
+//            System.out.print(f);
+//        }
+
+        // Add a simple prediction label
+        if (outTensorFloatArray[0] > outTensorFloatArray[1]) {
+            result = 0;
+        } else {
+            result = 1;
         }
 
-
-        return 0;
+        return result;
     }
 
 }
