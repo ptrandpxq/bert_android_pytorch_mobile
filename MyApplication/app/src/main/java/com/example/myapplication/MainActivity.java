@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private HashMap<Long, String> mIdTokenMap;
 
     private final int MODEL_INPUT_LENGTH = 128;
-    private final int EXTRA_ID_NUM = 3;
+    private final int EXTRA_ID_NUM = 2;  // In single sentence, we has [CLS] and [SEP]
     private final String CLS = "[CLS]";
     private final String SEP = "[SEP]";
     private final String PAD = "[PAD]";
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         String temp_message = String.valueOf(ids[1]);
         textView.setText(temp_message);
 
-        int a = this.Inference("I hate the movie .");
+        int a = this.Inference(" I like this book .");
         System.out.println("Prediction: " + a);
         // until here
 
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private final long[] tokenizer(String text) throws IOException {
+    private long[] tokenizer(String text) throws IOException {
             List<Long> tokenIdsText = this.wordPieceTokenizer(text);
 //            for (int i = 0; i < tokenIdsText.size(); ++i) {
 //                System.out.println(tokenIdsText.get(i));
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 //
 //            System.out.println(tokenIdsText.size()); // The size will be equal to the input length e.g., like the = 2
             for(int i = 0; i < tokenIdsText.size(); ++i) {
-                ids[i + 1] = tokenIdsText.get(i).longValue(); // put word ids into ids List
+                ids[i + 1] = tokenIdsText.get(i); // put word ids into ids List
             }
             ids[tokenIdsText.size() + 1] = this.mTokenIdMap.get(this.SEP);
 //
@@ -162,12 +162,12 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
-    private final List<Long> wordPieceTokenizer(String questionOrText) {
+    private List<Long> wordPieceTokenizer(String questionOrText) {
         // for each token, if it's in the vocab.txt (a key in mTokenIdMap), return its Id
         // else do: a. find the largest sub-token (at least the first letter) that exists in vocab;
         // b. add "##" to the rest (even if the rest is a valid token) and get the largest sub-token "##..." that exists in vocab;
         // and c. repeat b.
-        List<Long> tokenIds = (List)(new ArrayList());
+        List<Long> tokenIds = new ArrayList<>();
         Pattern p = Pattern.compile("\\w+|\\S");
         Matcher m = p.matcher((CharSequence)questionOrText); //seprate the tokens
 
