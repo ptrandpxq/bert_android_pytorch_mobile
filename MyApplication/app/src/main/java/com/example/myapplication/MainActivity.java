@@ -42,9 +42,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private Module mModule;
-    private EditText mEditTextQuestion;
+//    private EditText mEditTextQuestion;
     private EditText mEditTextText;
-    private TextView mTextViewAnswer;
+//    private TextView mTextViewAnswer;
 //    private Button mButton;
 
     private HashMap<String, Long> mTokenIdMap;
@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private final String SEP = "[SEP]";
     private final String PAD = "[PAD]";
     private final String UNK = "[UNK]";
-    private final String START_LOGITS = "start_logits";
-    private final String END_LOGITS = "end_logits";
+//    private final String START_LOGITS = "start_logits";
+//    private final String END_LOGITS = "end_logits";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,13 +115,14 @@ public class MainActivity extends AppCompatActivity {
             System.out.print(i+",");
         }
         System.out.println("?<?><");
-        String temp_message = String.valueOf(ids[1]);
-        textView.setText(temp_message);
+
 
         int a = this.Inference(" I like this book .");
-        System.out.println("Prediction: " + a);
-        // until here
 
+        System.out.println("Prediction: " + a);
+
+        String temp_message = String.valueOf(a);
+        textView.setText("Predicition: "+temp_message);
 
 
     }
