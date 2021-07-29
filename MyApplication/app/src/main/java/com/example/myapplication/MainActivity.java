@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.LongBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,12 +65,46 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // The onCreate function automatically execute when app is running
+
         // Load the model
         try {
             mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "BERT.ptl"));
         } catch (IOException e) {
             Log.e("BERT Inference", "Error reading assets", e);
             finish();
+        }
+
+        InputStreamReader ir = null; // need to use inpustreamreader and getassets method
+        try {
+            ir = new InputStreamReader(this.getAssets().open("vocab.txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        BufferedReader br = new BufferedReader(ir);
+
+        String line = null; // Initialize the variable line
+        this.mTokenIdMap = new HashMap<String, Long>(); // create the HashMap that maps word and id
+        this.mIdTokenMap = new HashMap<Long, String>(); // create the HashMap that maps id and word
+
+
+        long count = 0L;
+        while(true) {
+            try {
+                line = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (line != null) {
+//                System.out.println(line+count);
+                this.mTokenIdMap.put(line, count); // HashMap that maps word and id
+                this.mIdTokenMap.put(count, line); // HashMap that maps id and word
+                count++; // count++ and give each word a id
+            } else {
+                break;
+            }
+
         }
 
     }
@@ -84,29 +119,6 @@ public class MainActivity extends AppCompatActivity {
 
         // logic
 //        BufferedReader br = new BufferedReader(new InputStreamReader(this.getAssets().open("vocab.txt")));
-        InputStreamReader ir = new InputStreamReader(this.getAssets().open("vocab.txt")); // need to use inpustreamreader and getassets method
-//        FileReader fr = new FileReader("../vocab.txt");
-        BufferedReader br = new BufferedReader(ir);
-
-        String line;
-        this.mTokenIdMap = new HashMap<String, Long>(); // create the HashMap that maps word and id
-        this.mIdTokenMap = new HashMap<Long, String>(); // create the HashMap that maps id and word
-
-
-        long count = 0L;
-        while(true) {
-
-            line = br.readLine();
-            if (line != null) {
-//                System.out.println(line+count);
-                this.mTokenIdMap.put(line, count); // HashMap that maps word and id
-                this.mIdTokenMap.put(count, line); // HashMap that maps id and word
-                count++; // count++ and give each word a id
-            } else {
-                break;
-            }
-
-        }
 
 
         TextView textView = findViewById(R.id.text_output);
@@ -117,6 +129,13 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("?<?><");
 
 
+//        for(int i = 0; i < 100; ++i) {
+//            this.Inference(temp_input);
+//
+//
+//        }
+
+
         int a = this.Inference(" I like this book .");
 
         System.out.println("Prediction: " + a);
@@ -124,44 +143,80 @@ public class MainActivity extends AppCompatActivity {
         String temp_message = String.valueOf(a);
         textView.setText("Predicition: "+temp_message);
 
+        // Read the dataset file
+
+        InputStreamReader test_ir = new InputStreamReader(this.getAssets().open("sst-2_dev.tsv"), StandardCharsets.UTF_8); // need to use inpustreamreader and getassets method
+//        FileReader fr = new FileReader("../vocab.txt");
+        BufferedReader test_br = new BufferedReader(test_ir);
+
+        String test_line;
+//        test_line = test_br.readLine();
+
+
+
+        long test_count = 0L;
+        while(true) {
+            test_line = test_br.readLine();
+            // The first line is the labels, so ignore the first line
+            if (test_count == 0) {
+                test_count++;
+                continue;
+            }
+            if (test_line != null) {
+//                System.out.println(test_line+test_count);
+                String[] details = test_line.split(" \t");
+                System.out.println(details[0]);
+                int temp = this.Inference(details[0]);
+//                String test_message = String.valueOf(temp);
+                System.out.println(temp+"qweqwe"+ test_count+"/872");
+
+                test_count++; // count++ and give each word an id
+            } else {
+                break;
+            }
+
+        }
+        System.out.println("Its for test");
+
 
     }
+
 
     private long[] tokenizer(String text) throws IOException {
-            List<Long> tokenIdsText = this.wordPieceTokenizer(text);
-//            for (int i = 0; i < tokenIdsText.size(); ++i) {
-//                System.out.println(tokenIdsText.get(i));
-//            }
-            int inputLength = tokenIdsText.size() + this.EXTRA_ID_NUM;
-            long[] ids = new long[Math.min(this.MODEL_INPUT_LENGTH, inputLength)];
-
-
-            ids[0] = this.mTokenIdMap.get(this.CLS);
-//            System.out.println(ids[0]);
-//
-//            System.out.println(tokenIdsText.size()); // The size will be equal to the input length e.g., like the = 2
-            for(int i = 0; i < tokenIdsText.size(); ++i) {
-                ids[i + 1] = tokenIdsText.get(i); // put word ids into ids List
-            }
-            ids[tokenIdsText.size() + 1] = this.mTokenIdMap.get(this.SEP);
-//
-//            System.out.println(ids);
-//            for (long j : ids) {
-//                System.out.println("iiii"+j);
-//            }
-
-
-//            int maxTextLength = Math.min(tokenIdsText.size(), this.MODEL_INPUT_LENGTH - tokenIdsQuestion.size() - this.EXTRA_ID_NUM);
-//
-//            for(int i = 0; i < maxTextLength; ++i) {
-//                ids[tokenIdsQuestion.size() + i + 2] = tokenIdsText.get(i).longValue();
-//            }
-//
-//            ids[tokenIdsQuestion.size() + maxTextLength + 2] = this.mTokenIdMap.get(SEP);
-
-            return ids;
+        List<Long> tokenIdsText = this.wordPieceTokenizer(text);
+//        for (int i = 0; i < tokenIdsText.size(); ++i) {
+//            System.out.println(tokenIdsText.get(i));
 //        }
+        int inputLength = tokenIdsText.size() + this.EXTRA_ID_NUM;
+        long[] ids = new long[Math.min(this.MODEL_INPUT_LENGTH, inputLength)];
+
+
+        ids[0] = this.mTokenIdMap.get(this.CLS);
+//        System.out.println(ids[0]);
+//
+//        System.out.println(tokenIdsText.size()); // The size will be equal to the input length e.g., like the = 2
+        for(int i = 0; i < tokenIdsText.size(); ++i) {
+            ids[i + 1] = tokenIdsText.get(i); // put word ids into ids List
+        }
+        ids[tokenIdsText.size() + 1] = this.mTokenIdMap.get(this.SEP);
+
+//        System.out.println(ids);
+//        for (long j : ids) {
+//            System.out.println("iiii"+j);
+//        }
+//
+//
+//        int maxTextLength = Math.min(tokenIdsText.size(), this.MODEL_INPUT_LENGTH - tokenIdsQuestion.size() - this.EXTRA_ID_NUM);
+//
+//        for(int i = 0; i < maxTextLength; ++i) {
+//            ids[tokenIdsQuestion.size() + i + 2] = tokenIdsText.get(i).longValue();
+//        }
+//
+//        ids[tokenIdsQuestion.size() + maxTextLength + 2] = this.mTokenIdMap.get(SEP);
+
+        return ids;
     }
+
 
     private List<Long> wordPieceTokenizer(String questionOrText) {
         // for each token, if it's in the vocab.txt (a key in mTokenIdMap), return its Id
