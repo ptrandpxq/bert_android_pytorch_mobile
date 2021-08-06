@@ -19,6 +19,7 @@ import org.pytorch.Tensor;
 //import org.pytorch.MemoryFormat;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.LongBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private final String UNK = "[UNK]";
 //    private final String START_LOGITS = "start_logits";
 //    private final String END_LOGITS = "end_logits";
+    public long inferenceTime = 0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,11 +125,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         TextView textView = findViewById(R.id.text_output);
-        long[] ids = tokenizer("like two the the"); // let input pass the tokenizer
-        for (long i : ids) {
-            System.out.print(i+",");
-        }
-        System.out.println("?<?><");
+//        long[] ids = tokenizer("like two the the"); // let input pass the tokenizer
+//        for (long i : ids) {
+//            System.out.print(i+",");
+//        }
+//        System.out.println("?<?><");
 
 
 //        for(int i = 0; i < 100; ++i) {
@@ -134,9 +137,20 @@ public class MainActivity extends AppCompatActivity {
 //
 //
 //        }
+//        OutputStreamWriter iw = null; // need to use inpustreamreader and getassets method
+//        try {
+//            iw = new OutputStreamWriter(this.openFileOutput("test.txt", MODE_PRIVATE));
+//            iw.write("tstss");//将byte数组写入文件
+//            iw.close();//关闭文件输出流
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        BufferedWriter bw = new BufferedWriter(iw);
+//
+//        bw.write("asdasd");
 
 
-        int a = this.Inference(" I like this book .");
+        int a = this.Inference("like the .");
 
         System.out.println("Prediction: " + a);
 
@@ -152,6 +166,9 @@ public class MainActivity extends AppCompatActivity {
         String test_line;
 //        test_line = test_br.readLine();
 
+        int accurate_case = 0;
+        int false_case = 0;
+
 
 
         long test_count = 0L;
@@ -165,9 +182,18 @@ public class MainActivity extends AppCompatActivity {
             if (test_line != null) {
 //                System.out.println(test_line+test_count);
                 String[] details = test_line.split(" \t");
-                System.out.println(details[0]);
+                // details[0] is the sentence, details[1] is the label
+//                System.out.println(details[0]);
+//                System.out.println(details[1]+"bnmbnmbnm");
+                System.out.println(accurate_case);
                 int temp = this.Inference(details[0]);
+//                System.out.print(temp);
 //                String test_message = String.valueOf(temp);
+                if (temp == Integer.parseInt(details[1])) {
+                    accurate_case++;
+                } else {
+                    false_case++;
+                }
                 System.out.println(temp+"qweqwe"+ test_count+"/872");
 
                 test_count++; // count++ and give each word an id
@@ -177,6 +203,11 @@ public class MainActivity extends AppCompatActivity {
 
         }
         System.out.println("Its for test");
+        System.out.println(inferenceTime+" ms");
+        System.out.println("accurate_case"+accurate_case);
+        System.out.println("false_case"+false_case);
+        System.out.println("Accuracy: "+(accurate_case/(accurate_case+false_case)));
+
 
 
     }
@@ -237,18 +268,18 @@ public class MainActivity extends AppCompatActivity {
 
                 for (int i = 0; i < token.length(); ++i) {
 
-                    System.out.println("jinlaile"+token.substring(0, token.length() - i - 1));
+//                    System.out.println("jinlaile"+token.substring(0, token.length() - i - 1));
                     if (this.mTokenIdMap.containsKey(token.substring(0, token.length() - i - 1))) {
 
                         tokenIds.add(this.mTokenIdMap.get(token.substring(0, token.length() - i - 1)));
                         String subToken = token.substring(token.length() - i - 1); // latter part of the word
                         int j = 0;
-                        System.out.println(this.mTokenIdMap.get(token.substring(0, token.length() - i - 1)));
-                        System.out.println(subToken);
+//                        System.out.println(this.mTokenIdMap.get(token.substring(0, token.length() - i - 1)));
+//                        System.out.println(subToken);
 
                         while (j < subToken.length()) {
                             if (this.mTokenIdMap.containsKey("##" + subToken.substring(0, subToken.length() - j))) {
-                                System.out.println(this.mTokenIdMap.get("##" + subToken.substring(0, subToken.length() - j)));
+//                                System.out.println(this.mTokenIdMap.get("##" + subToken.substring(0, subToken.length() - j)));
                                 tokenIds.add(this.mTokenIdMap.get("##" + subToken.substring(0, subToken.length() - j)));
                                 subToken = subToken.substring(subToken.length() - j);
                                 j = subToken.length() - j;
@@ -299,9 +330,9 @@ public class MainActivity extends AppCompatActivity {
         int result;
 
         long[] tokenIds = this.tokenizer(input);
-        for (long i : tokenIds) {
-            System.out.println("Token id "+i);
-        }
+//        for (long i : tokenIds) {
+//            System.out.println("Token id "+i);
+//        }
 
         LongBuffer inTensorBuffer = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
         // put token ids to inTensorBuffer
@@ -328,20 +359,22 @@ public class MainActivity extends AppCompatActivity {
         LongBuffer inTensorBuffer_3 = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
         // put token ids to inTensorBuffer
         for (int i = 0; i < MODEL_INPUT_LENGTH; ++i) {
-            inTensorBuffer_3.put(1L);
+            inTensorBuffer_3.put(0L);
         }
         Tensor inTensor3 = Tensor.fromBlob(inTensorBuffer_3, new long[]{1L, this.MODEL_INPUT_LENGTH});
 
 
-        System.out.println(inTensor);
+//        System.out.println(inTensor);
         long[] test = inTensor.getDataAsLongArray();
-        for (long i : test) {
-            System.out.println(i);
-        }
-//        final long startTime = SystemClock.elapsedRealtime();
+//        for (long i : test) {
+//            System.out.println(i);
+//        }
+
+        final long startTime = SystemClock.elapsedRealtime();
         IValue outIValue = mModule.forward(IValue.from(inTensor), IValue.from(inTensor2), IValue.from(inTensor3));
 //        IValue outTensors = mModule.forward(IValue.from(inTensor)); // the output of BERT is a tuple
-//        final long inferenceTime = SystemClock.elapsedRealtime() - startTime;
+        long inferenceTime_temp = SystemClock.elapsedRealtime() - startTime;
+        inferenceTime += inferenceTime_temp;
 //        Log.d("BERTINFERNCE",  "inference time (ms): " + inferenceTime);
 
         IValue[] outTuple = outIValue.toTuple();
@@ -351,9 +384,10 @@ public class MainActivity extends AppCompatActivity {
         float[] outTensorFloatArray = outTensor.getDataAsFloatArray();
 //        System.out.println(outTuple[0].toTensor());
 
-//        for (float f : outTensorFloatArray) {
-//            System.out.print(f);
-//        }
+        for (float f : outTensorFloatArray) {
+            System.out.print(f);
+            System.out.println(" ");
+        }
 
         // Add a simple prediction label
         if (outTensorFloatArray[0] > outTensorFloatArray[1]) {
