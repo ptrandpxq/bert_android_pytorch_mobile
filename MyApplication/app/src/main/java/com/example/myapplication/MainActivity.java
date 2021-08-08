@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 //        bw.write("asdasd");
 
 
-        int a = this.Inference("like the .");
+        int a = this.Inference("it 's a charming and often affecting journey .");
 
         System.out.println("Prediction: " + a);
 
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 //                System.out.println(details[1]+"bnmbnmbnm");
                 System.out.println(accurate_case);
                 int temp = this.Inference(details[0]);
-//                System.out.print(temp);
+                System.out.print(temp);
 //                String test_message = String.valueOf(temp);
                 if (temp == Integer.parseInt(details[1])) {
                     accurate_case++;
@@ -330,9 +330,10 @@ public class MainActivity extends AppCompatActivity {
         int result;
 
         long[] tokenIds = this.tokenizer(input);
-//        for (long i : tokenIds) {
-//            System.out.println("Token id "+i);
-//        }
+        System.out.print("Token ids: ");
+        for (long i : tokenIds) {
+            System.out.print(i);
+        }
 
         LongBuffer inTensorBuffer = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
         // put token ids to inTensorBuffer
@@ -348,20 +349,23 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        LongBuffer inTensorBuffer_2 = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
-        // put token ids to inTensorBuffer
-        for (int i = 0; i < MODEL_INPUT_LENGTH; ++i) {
-            inTensorBuffer_2.put(0L);
+        LongBuffer attention_mask_Buffer = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
+        // Set attention mask 1
+        for (int i = 0; i < tokenIds.length; ++i) {
+            attention_mask_Buffer.put(1L);
         }
-        Tensor inTensor2 = Tensor.fromBlob(inTensorBuffer_2, new long[]{1L, this.MODEL_INPUT_LENGTH});
+        for (int i = 0; i < MODEL_INPUT_LENGTH-tokenIds.length; ++i) {
+            attention_mask_Buffer.put(0L);
+        }
+        Tensor attention_mask = Tensor.fromBlob(attention_mask_Buffer, new long[]{1L, this.MODEL_INPUT_LENGTH});
 
 
-        LongBuffer inTensorBuffer_3 = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
+        LongBuffer token_type_ids_Buffer = Tensor.allocateLongBuffer(this.MODEL_INPUT_LENGTH);
         // put token ids to inTensorBuffer
         for (int i = 0; i < MODEL_INPUT_LENGTH; ++i) {
-            inTensorBuffer_3.put(0L);
+            token_type_ids_Buffer.put(0L);
         }
-        Tensor inTensor3 = Tensor.fromBlob(inTensorBuffer_3, new long[]{1L, this.MODEL_INPUT_LENGTH});
+        Tensor token_type_ids = Tensor.fromBlob(token_type_ids_Buffer, new long[]{1L, this.MODEL_INPUT_LENGTH});
 
 
 //        System.out.println(inTensor);
@@ -371,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         final long startTime = SystemClock.elapsedRealtime();
-        IValue outIValue = mModule.forward(IValue.from(inTensor), IValue.from(inTensor2), IValue.from(inTensor3));
+        IValue outIValue = mModule.forward(IValue.from(inTensor), IValue.from(attention_mask), IValue.from(token_type_ids));
 //        IValue outTensors = mModule.forward(IValue.from(inTensor)); // the output of BERT is a tuple
         long inferenceTime_temp = SystemClock.elapsedRealtime() - startTime;
         inferenceTime += inferenceTime_temp;
@@ -385,6 +389,7 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println(outTuple[0].toTensor());
 
         for (float f : outTensorFloatArray) {
+            System.out.print(" ");
             System.out.print(f);
             System.out.println(" ");
         }
