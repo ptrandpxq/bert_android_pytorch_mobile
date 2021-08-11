@@ -156,6 +156,8 @@ public class MainActivity extends AppCompatActivity {
 
         String temp_message = String.valueOf(a);
         textView.setText("Predicition: "+temp_message);
+        textView.setText("In progress...");
+        SystemClock.sleep(1000);
 
         // Read the dataset file
 
@@ -166,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
         String test_line;
 //        test_line = test_br.readLine();
 
+
+        // Initialize the number of accurate case and the number of false case
         int accurate_case = 0;
         int false_case = 0;
 
@@ -202,11 +206,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+        float accuracy = (float)accurate_case/((float)accurate_case+(float)false_case);
         System.out.println("Its for test");
         System.out.println(inferenceTime+" ms");
         System.out.println("accurate_case"+accurate_case);
         System.out.println("false_case"+false_case);
-        System.out.println("Accuracy: "+(accurate_case/(accurate_case+false_case)));
+        System.out.println("Accuracy: "+accuracy);
+
+        textView.setText("Examples: "+accurate_case+"/"+(accurate_case+false_case)+"\nInference time: "+inferenceTime+"ms");
 
 
 
