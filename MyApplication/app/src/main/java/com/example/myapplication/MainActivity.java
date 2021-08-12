@@ -9,6 +9,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.pytorch.IValue;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mEditTextText;
 //    private TextView mTextViewAnswer;
 //    private Button mButton;
+//    private ProgressBar mProgressBar;
 
     private HashMap<String, Long> mTokenIdMap;
     private HashMap<Long, String> mIdTokenMap;
@@ -156,8 +158,6 @@ public class MainActivity extends AppCompatActivity {
 
         String temp_message = String.valueOf(a);
         textView.setText("Predicition: "+temp_message);
-        textView.setText("In progress...");
-        SystemClock.sleep(1000);
 
         // Read the dataset file
 
