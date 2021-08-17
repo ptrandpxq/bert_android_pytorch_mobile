@@ -46,9 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private Module mModule;
-//    private EditText mEditTextQuestion;
     private EditText mEditTextText;
-//    private TextView mTextViewAnswer;
 //    private Button mButton;
 //    private ProgressBar mProgressBar;
 
@@ -61,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private final String SEP = "[SEP]";
     private final String PAD = "[PAD]";
     private final String UNK = "[UNK]";
-//    private final String START_LOGITS = "start_logits";
-//    private final String END_LOGITS = "end_logits";
     public long inferenceTime = 0L;
 
     @Override
@@ -109,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 break;
             }
-
         }
 
     }
@@ -131,19 +126,16 @@ public class MainActivity extends AppCompatActivity {
 //        for (long i : ids) {
 //            System.out.print(i+",");
 //        }
-//        System.out.println("?<?><");
-
 
 //        for(int i = 0; i < 100; ++i) {
 //            this.Inference(temp_input);
-//
-//
 //        }
+
 //        OutputStreamWriter iw = null; // need to use inpustreamreader and getassets method
 //        try {
 //            iw = new OutputStreamWriter(this.openFileOutput("test.txt", MODE_PRIVATE));
-//            iw.write("tstss");//将byte数组写入文件
-//            iw.close();//关闭文件输出流
+//            iw.write("tstss");
+//            iw.close();
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
@@ -160,20 +152,16 @@ public class MainActivity extends AppCompatActivity {
         textView.setText("Predicition: "+temp_message);
 
         // Read the dataset file
-
         InputStreamReader test_ir = new InputStreamReader(this.getAssets().open("sst-2_dev.tsv"), StandardCharsets.UTF_8); // need to use inpustreamreader and getassets method
-//        FileReader fr = new FileReader("../vocab.txt");
         BufferedReader test_br = new BufferedReader(test_ir);
 
         String test_line;
-//        test_line = test_br.readLine();
+//        test_line = test_br.readLine(); // Read lines
 
 
         // Initialize the number of accurate case and the number of false case
         int accurate_case = 0;
         int false_case = 0;
-
-
 
         long test_count = 0L;
         while(true) {
@@ -207,15 +195,14 @@ public class MainActivity extends AppCompatActivity {
 
         }
         float accuracy = (float)accurate_case/((float)accurate_case+(float)false_case);
+
         System.out.println("Its for test");
-        System.out.println(inferenceTime+" ms");
-        System.out.println("accurate_case"+accurate_case);
-        System.out.println("false_case"+false_case);
+        System.out.println("Inference time: "+inferenceTime+" ms");
+        System.out.println("Accurate case: "+accurate_case);
+        System.out.println("False case: "+false_case);
         System.out.println("Accuracy: "+accuracy);
 
-        textView.setText("Examples: "+accurate_case+"/"+(accurate_case+false_case)+"\nInference time: "+inferenceTime+"ms");
-
-
+        textView.setText("Examples:"+(accurate_case+false_case)+"\nInference time: "+inferenceTime+"ms");
 
     }
 
@@ -242,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
 //        for (long j : ids) {
 //            System.out.println("iiii"+j);
 //        }
-//
 //
 //        int maxTextLength = Math.min(tokenIdsText.size(), this.MODEL_INPUT_LENGTH - tokenIdsQuestion.size() - this.EXTRA_ID_NUM);
 //
@@ -274,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
 
                 for (int i = 0; i < token.length(); ++i) {
-
 //                    System.out.println("jinlaile"+token.substring(0, token.length() - i - 1));
                     if (this.mTokenIdMap.containsKey(token.substring(0, token.length() - i - 1))) {
 
@@ -376,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 //        System.out.println(inTensor);
-        long[] test = inTensor.getDataAsLongArray();
+//        long[] test = inTensor.getDataAsLongArray();
 //        for (long i : test) {
 //            System.out.println(i);
 //        }
