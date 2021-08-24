@@ -118,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         // logic
-//        BufferedReader br = new BufferedReader(new InputStreamReader(this.getAssets().open("vocab.txt")));
 
 
         TextView textView = findViewById(R.id.text_output);
@@ -131,18 +130,6 @@ public class MainActivity extends AppCompatActivity {
 //            this.Inference(temp_input);
 //        }
 
-//        OutputStreamWriter iw = null; // need to use inpustreamreader and getassets method
-//        try {
-//            iw = new OutputStreamWriter(this.openFileOutput("test.txt", MODE_PRIVATE));
-//            iw.write("tstss");
-//            iw.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        BufferedWriter bw = new BufferedWriter(iw);
-//
-//        bw.write("asdasd");
-
 
         int a = this.Inference("it 's a charming and often affecting journey .");
 
@@ -150,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
         String temp_message = String.valueOf(a);
         textView.setText("Predicition: "+temp_message);
+
 
         // Read the dataset file
         InputStreamReader test_ir = new InputStreamReader(this.getAssets().open("sst-2_dev.tsv"), StandardCharsets.UTF_8); // need to use inpustreamreader and getassets method
@@ -218,25 +206,12 @@ public class MainActivity extends AppCompatActivity {
 
         ids[0] = this.mTokenIdMap.get(this.CLS);
 //        System.out.println(ids[0]);
-//
+
 //        System.out.println(tokenIdsText.size()); // The size will be equal to the input length e.g., like the = 2
         for(int i = 0; i < tokenIdsText.size(); ++i) {
             ids[i + 1] = tokenIdsText.get(i); // put word ids into ids List
         }
         ids[tokenIdsText.size() + 1] = this.mTokenIdMap.get(this.SEP);
-
-//        System.out.println(ids);
-//        for (long j : ids) {
-//            System.out.println("iiii"+j);
-//        }
-//
-//        int maxTextLength = Math.min(tokenIdsText.size(), this.MODEL_INPUT_LENGTH - tokenIdsQuestion.size() - this.EXTRA_ID_NUM);
-//
-//        for(int i = 0; i < maxTextLength; ++i) {
-//            ids[tokenIdsQuestion.size() + i + 2] = tokenIdsText.get(i).longValue();
-//        }
-//
-//        ids[tokenIdsQuestion.size() + maxTextLength + 2] = this.mTokenIdMap.get(SEP);
 
         return ids;
     }
@@ -311,13 +286,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int Inference(String input) throws IOException {
-//        float[] ft= new float[1024];
-//        long[] shape = {1,1024};
-//        Tensor test_tensor = Tensor.fromBlob(ft, shape);
-//        System.out.println(test_tensor+"iopiopiop");
-
-//        IValue outTensors = mModule.forward(IValue.from(test_tensor));
-//        System.out.println(outTensors.toTensor());
 
         int result;
 
