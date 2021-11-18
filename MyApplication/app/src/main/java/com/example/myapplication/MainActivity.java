@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
 
         // logic
 
-
         TextView textView = findViewById(R.id.text_output);
 //        long[] ids = tokenizer("like two the the"); // let input pass the tokenizer
 //        for (long i : ids) {
@@ -286,7 +285,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int Inference(String input) throws IOException {
-
         int result;
 
         long[] tokenIds = this.tokenizer(input);
