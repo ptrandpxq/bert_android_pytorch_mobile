@@ -38,7 +38,7 @@ mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext
 ### 3. Run the app
 Select an Android emulator or device and build and run the app. The demo screenshot is as follows:
 
-<img swidth="440" height="300" src="./imgs/screenshot.png"/>
+<img src="./imgs/screenshot.png"/>
 
 Note that the code make inference on the SST-2 dev set (binary classification task), and there is no feedback until the inference is done, you can check the run console to make sure everything is fine.
 
