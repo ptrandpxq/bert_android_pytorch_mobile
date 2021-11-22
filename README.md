@@ -1,11 +1,11 @@
 # bert_android
 
-This repository is for the development of make the BERT model inference on android devices.
+This repository provides the implementation of the BERT model and make the model inference on android devices.
 
 ## Prerequisites
 
-* PyTorch 1.9.0 and torchvision 0.10.0 (Optional)
-* Python 3.8 or above (Optional)
+* PyTorch 1.9.0 and torchvision 0.10.0 or later
+* Python 3.8 or above
 * Android Pytorch library pytorch_android_lite:1.9.0, pytorch_android_torchvision:1.9.0
 * Android Studio 4.0.1 or later
 
@@ -15,7 +15,7 @@ To Test Run the BERT Android App, follow the steps below:
 
 ### 1. Prepare the Model
 
-You can train your own BERT model (the BERT-base model) or download a BERT base model file to the `/app/src/main/assets` folder using the link [here](Coming soon).
+You can train your own BERT model (the BERT-base model) or download a BERT base model file to the `/app/src/main/assets` folder using the link [here](https://huggingface.co/textattack/bert-base-uncased-SST-2/tree/main).
 
 Recommend to download the model from huggingface.
 
