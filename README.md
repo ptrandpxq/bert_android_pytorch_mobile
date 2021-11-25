@@ -1,11 +1,11 @@
 # bert_android
 
-This repository provides the implementation of the BERT model and make the model inference on android devices.
+This repository is for the development of make the BERT model inference on android devices.
 
 ## Prerequisites
 
-* PyTorch 1.9.0 and torchvision 0.10.0 or later
-* Python 3.8 or above
+* PyTorch 1.9.0 and torchvision 0.10.0 (Optional)
+* Python 3.8 or above (Optional)
 * Android Pytorch library pytorch_android_lite:1.9.0, pytorch_android_torchvision:1.9.0
 * Android Studio 4.0.1 or later
 
@@ -15,7 +15,7 @@ To Test Run the BERT Android App, follow the steps below:
 
 ### 1. Prepare the Model
 
-You can train your own BERT model (the BERT-base model) or download a BERT base model file to the `/app/src/main/assets` folder using the link [here](https://huggingface.co/textattack/bert-base-uncased-SST-2/tree/main).
+You can train your own BERT model (the BERT-base model) or download a BERT base model file to the `/app/src/main/assets` folder using the link [here](Coming soon).
 
 Recommend to download the model from huggingface.
 
@@ -38,11 +38,13 @@ mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext
 ### 3. Run the app
 Select an Android emulator or device and build and run the app. The demo screenshot is as follows:
 
-<img swidth="840" height="600" src="./imgs/screenshot.png"/>
+<img swidth="440" height="300" src="./imgs/screenshot.jpg"/>
 
-Note that the code make inference on the SST-2 dev set (binary classification task), and there is no feedback until the inference is done, you can check the run console to make sure everything is fine.
+Input some text (e.g., I like reading.) and touch the button Start to get the result (binary classification task).
 
-To do: input a sentence and give the answer, otherwise its to hard to understand.
+Mode 2 (for advanced users)
+
+The code can make inference on the SST-2 dev set (binary classification task). Please check the commnet part of the code and fit your requirement. There is no feedback until the inference is done, you can check the run console to make sure everything is fine.
 
 ## Tutorial
 

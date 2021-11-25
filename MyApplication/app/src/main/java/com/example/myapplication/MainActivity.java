@@ -112,9 +112,9 @@ public class MainActivity extends AppCompatActivity {
     /** Called when the user taps the Send button */
     public void sendMessage(View view) throws IOException {
         // Do something in response to button
-        EditText editText = (EditText) findViewById(R.id.editTextTextPersonName2);
+        EditText editText = (EditText) findViewById(R.id.editText_input_string);
 
-        String message = editText.getText().toString();
+        String message = editText.getText().toString(); // The input string
 
 
         // logic
@@ -130,66 +130,71 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
 
-        int a = this.Inference("it 's a charming and often affecting journey .");
+//        int a = this.Inference("it 's a charming and often affecting journey ."); // Test case
 
+        int a = this.Inference(message);
         System.out.println("Prediction: " + a);
 
         String temp_message = String.valueOf(a);
         textView.setText("Predicition: "+temp_message);
 
 
-        // Read the dataset file
-        InputStreamReader test_ir = new InputStreamReader(this.getAssets().open("sst-2_dev.tsv"), StandardCharsets.UTF_8); // need to use inpustreamreader and getassets method
-        BufferedReader test_br = new BufferedReader(test_ir);
-
-        String test_line;
-//        test_line = test_br.readLine(); // Read lines
 
 
-        // Initialize the number of accurate case and the number of false case
-        int accurate_case = 0;
-        int false_case = 0;
-
-        long test_count = 0L;
-        while(true) {
-            test_line = test_br.readLine();
-            // The first line is the labels, so ignore the first line
-            if (test_count == 0) {
-                test_count++;
-                continue;
-            }
-            if (test_line != null) {
-//                System.out.println(test_line+test_count);
-                String[] details = test_line.split(" \t");
-                // details[0] is the sentence, details[1] is the label
-//                System.out.println(details[0]);
-//                System.out.println(details[1]+"bnmbnmbnm");
-                System.out.println(accurate_case);
-                int temp = this.Inference(details[0]);
-                System.out.print(temp);
-//                String test_message = String.valueOf(temp);
-                if (temp == Integer.parseInt(details[1])) {
-                    accurate_case++;
-                } else {
-                    false_case++;
-                }
-                System.out.println(temp+"qweqwe"+ test_count+"/872");
-
-                test_count++; // count++ and give each word an id
-            } else {
-                break;
-            }
-
-        }
-        float accuracy = (float)accurate_case/((float)accurate_case+(float)false_case);
-
-        System.out.println("Its for test");
-        System.out.println("Inference time: "+inferenceTime+" ms");
-        System.out.println("Accurate case: "+accurate_case);
-        System.out.println("False case: "+false_case);
-        System.out.println("Accuracy: "+accuracy);
-
-        textView.setText("Examples:"+(accurate_case+false_case)+"\nInference time: "+inferenceTime+"ms");
+//        // Make inference on the SST-2 task
+//
+//        // Read the dataset file
+//        InputStreamReader test_ir = new InputStreamReader(this.getAssets().open("sst-2_dev.tsv"), StandardCharsets.UTF_8); // need to use inpustreamreader and getassets method
+//        BufferedReader test_br = new BufferedReader(test_ir);
+//
+//        String test_line;
+////        test_line = test_br.readLine(); // Read lines
+//
+//
+//        // Initialize the number of accurate case and the number of false case
+//        int accurate_case = 0;
+//        int false_case = 0;
+//
+//        long test_count = 0L;
+//        while(true) {
+//            test_line = test_br.readLine();
+//            // The first line is the labels, so ignore the first line
+//            if (test_count == 0) {
+//                test_count++;
+//                continue;
+//            }
+//            if (test_line != null) {
+////                System.out.println(test_line+test_count);
+//                String[] details = test_line.split(" \t");
+//                // details[0] is the sentence, details[1] is the label
+////                System.out.println(details[0]);
+////                System.out.println(details[1]+"bnmbnmbnm");
+//                System.out.println(accurate_case);
+//                int temp = this.Inference(details[0]);
+//                System.out.print(temp);
+////                String test_message = String.valueOf(temp);
+//                if (temp == Integer.parseInt(details[1])) {
+//                    accurate_case++;
+//                } else {
+//                    false_case++;
+//                }
+//                System.out.println(temp+"qweqwe"+ test_count+"/872");
+//
+//                test_count++; // count++ and give each word an id
+//            } else {
+//                break;
+//            }
+//
+//        }
+//        float accuracy = (float)accurate_case/((float)accurate_case+(float)false_case);
+//
+//        System.out.println("Its for test");
+//        System.out.println("Inference time: "+inferenceTime+" ms");
+//        System.out.println("Accurate case: "+accurate_case);
+//        System.out.println("False case: "+false_case);
+//        System.out.println("Accuracy: "+accuracy);
+//
+//        textView.setText("Examples:"+(accurate_case+false_case)+"\nInference time: "+inferenceTime+"ms");
 
     }
 
