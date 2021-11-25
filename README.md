@@ -38,7 +38,7 @@ mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext
 ### 3. Run the app
 Select an Android emulator or device and build and run the app. The demo screenshot is as follows:
 
-<img swidth="440" height="300" src="./imgs/screenshot.jpg"/>
+<img swidth="440" height="300" src="./imgs/screenshot.png"/>
 
 Input some text (e.g., I like reading.) and touch the button Start to get the result (binary classification task).
 
