@@ -40,9 +40,11 @@ Select an Android emulator or device and build and run the app. The demo screens
 
 <img swidth="440" height="300" src="./imgs/screenshot.jpg"/>
 
-Note that the code make inference on the SST-2 dev set (binary classification task), and there is no feedback until the inference is done, you can check the run console to make sure everything is fine.
+Input some text (e.g., I like reading.) and touch the button Start to get the result (binary classification task).
 
-To do: input a sentence and give the answer, otherwise its to hard to understand.
+Mode 2 (for advanced users)
+
+The code can make inference on the SST-2 dev set (binary classification task). Please check the commnet part of the code and fit your requirement. There is no feedback until the inference is done, you can check the run console to make sure everything is fine.
 
 ## Tutorial
 
